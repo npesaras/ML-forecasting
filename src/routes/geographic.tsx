@@ -11,17 +11,18 @@ export const Route = createFileRoute("/geographic")({
   component: GeographicVisualization,
 });
 
-const choroplethComponents = {
-  destination: <ChoroplethMap />,
-  origin: <PHOriginChoropleth />,
-};
+type ChoroplethKey = "destination" | "origin";
 
-type ChoroplethKey = keyof typeof choroplethComponents;
+const choroplethComponents = (year: number | "all") => ({
+  destination: <ChoroplethMap selectedYear={year} />,
+  origin: <PHOriginChoropleth selectedYear={year} />,
+});
 
 function GeographicVisualization() {
   const [selectedMap, setSelectedMap] = useState<ChoroplethKey>("destination");
+  const [selectedYear, setSelectedYear] = useState<number | "all">("all");
   const stats = useDashboardStats();
-  const { data: topDestinations, loading: comparisonLoading, error: comparisonError } = useComparisonData();
+  const { data: topDestinations, loading: comparisonLoading, error: comparisonError, years } = useComparisonData(selectedYear === "all" ? undefined : selectedYear);
 
   // Ensure unique countries and take top 4
   const topFour = useMemo(() => {
@@ -67,21 +68,20 @@ function GeographicVisualization() {
           <FilterSelect
             label="Map Type"
             value={selectedMap}
-            options={Object.keys(choroplethComponents).map((key) => ({
-              value: key,
-              label: key === "destination" ? "Destination Countries" : "Origin Provinces",
-            }))}
+            options={[
+              { value: "destination", label: "Destination Countries" },
+              { value: "origin", label: "Origin Provinces" },
+            ]}
             onChange={(val) => setSelectedMap(val as ChoroplethKey)}
           />
           <FilterSelect
             label="Data Year"
-            value="2020"
+            value={selectedYear.toString()}
             options={[
-              { value: "2020", label: "2020" },
-              { value: "2019", label: "2019" },
-              { value: "2018", label: "2018" },
+              { value: "all", label: "All Years (1981-2020)" },
+              ...years.map((year) => ({ value: year.toString(), label: year.toString() })),
             ]}
-            onChange={() => {}} // Placeholder
+            onChange={(val) => setSelectedYear(val === "all" ? "all" : parseInt(val))}
           />
         </div>
       </DashboardCard>
@@ -124,7 +124,7 @@ function GeographicVisualization() {
       {/* Main Map Display */}
       <DashboardCard title="Map Visualization" className="p-0 overflow-hidden">
         <div className="bg-card p-4">
-          {choroplethComponents[selectedMap]}
+          {choroplethComponents(selectedYear)[selectedMap]}
         </div>
       </DashboardCard>
 

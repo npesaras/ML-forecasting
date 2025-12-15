@@ -136,11 +136,13 @@ const regionToProvinces: Record<string, string[]> = {
   ],
 };
 
-const PHOriginChoropleth = () => {
-  const { selectedYear, onSelectChange } = useYearFilter("all");
+interface PHOriginChoroplethProps {
+  selectedYear: number | "all";
+}
+
+const PHOriginChoropleth = ({ selectedYear }: PHOriginChoroplethProps) => {
   const {
     totals,
-    years,
     loading,
     error: dataError,
   } = useParseOriginProvinceData(selectedYear);
@@ -255,22 +257,6 @@ const PHOriginChoropleth = () => {
           ? "Emigrant Origin Density by Province (1988 - 2020)"
           : `Emigrant Origin Density by Province in ${selectedYear}`}
       </h2>
-
-      {/* Year Filter Dropdown */}
-      <div className="mb-4 flex justify-center">
-        <select
-          value={selectedYear}
-          onChange={onSelectChange}
-          className="px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="all">All Years (1988-2020)</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-      </div>
 
       <div className={isMobile ? "overflow-x-auto" : ""}>
         <div style={{ width: isMobile ? "600px" : "100%", height: "600px" }}>

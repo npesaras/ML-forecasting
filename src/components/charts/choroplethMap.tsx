@@ -3,13 +3,15 @@ import { ResponsiveChoropleth } from '@nivo/geo'
 import { useParseAllDestinationData } from '../../hooks/useParseAllDestinationData'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { useGeoJSON } from '../../hooks/useGeoJSON'
-import { useYearFilter } from '../../hooks/useYearFilter'
 import { toIso3 } from '../../utils/countryMapping'
 import LoadingScreen from '../loadingScreen'
 
-const ChoroplethMap = () => {
-  const { selectedYear, onSelectChange } = useYearFilter('all')
-  const { mapData, loading, years } = useParseAllDestinationData(selectedYear)
+interface ChoroplethMapProps {
+  selectedYear: number | "all";
+}
+
+const ChoroplethMap = ({ selectedYear }: ChoroplethMapProps) => {
+  const { mapData, loading } = useParseAllDestinationData(selectedYear)
   const isMobile = useIsMobile()
   const { data: geoData, loading: geoLoading, error: geoError } = useGeoJSON('/data/worldCountries.json')
 
@@ -47,20 +49,6 @@ const ChoroplethMap = () => {
           : `Emigrant Destination of Filipinos by Country in ${selectedYear}`
         }
       </h2>
-
-      {/* Year Filter Dropdown */}
-      <div className="mb-4 flex justify-center">
-        <select
-          value={selectedYear}
-          onChange={onSelectChange}
-          className="px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="all">All Years (1981-2020)</option>
-          {years.map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
-      </div>
 
       <div className={isMobile ? 'overflow-x-auto' : ''}>
         <div style={{ width: isMobile ? '900px' : '100%', height: '650px' }}>
