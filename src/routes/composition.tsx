@@ -11,7 +11,7 @@ export const Route = createFileRoute("/composition")({
 });
 
 function CompositionCharts() {
-  const [selectedYear, setSelectedYear] = useState<number>(1981);
+  const [selectedYear, setSelectedYear] = useState<number | "all">("all");
   const {
     destinationData,
     ageGroupData,
@@ -19,7 +19,7 @@ function CompositionCharts() {
     loading,
     error,
     years,
-  } = useCompositionData(selectedYear);
+  } = useCompositionData(selectedYear === "all" ? undefined : selectedYear);
 
   if (loading) {
     return (
@@ -112,9 +112,12 @@ function CompositionCharts() {
       <div className="flex items-center space-x-4">
         <FilterSelect
           label="Year"
-          value={selectedYear}
-          options={years.map((y) => ({ value: y, label: y.toString() }))}
-          onChange={(val) => setSelectedYear(Number(val))}
+          value={selectedYear.toString()}
+          options={[
+            { value: "all", label: "All Years (1981-2020)" },
+            ...years.map((y) => ({ value: y.toString(), label: y.toString() })),
+          ]}
+          onChange={(val) => setSelectedYear(val === "all" ? "all" : Number(val))}
         />
       </div>
 
@@ -123,7 +126,7 @@ function CompositionCharts() {
         <div className="bg-yellow-500/15 border border-yellow-500/30 rounded-lg p-4">
           <p className="text-yellow-600 dark:text-yellow-400 font-semibold mb-2">No Data Available</p>
           <p className="text-yellow-600 dark:text-yellow-400 text-sm">
-            No composition data found for year {selectedYear}. Please upload CSV data files (destination countries, age groups, and civil status data) using the Upload page.
+            No composition data found for {selectedYear === "all" ? "1981-2020" : `year ${selectedYear}`}. Please upload CSV data files (destination countries, age groups, and civil status data) using the Upload page.
           </p>
         </div>
       )}
@@ -132,7 +135,7 @@ function CompositionCharts() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Destination Countries Pie Chart */}
         <DashboardCard
-          title={`Destination Countries Distribution (${selectedYear})`}
+          title={`Destination Countries Distribution ${selectedYear === "all" ? "(1981-2020)" : `(${selectedYear})`}`}
         >
           {destinationData.length === 0 ? (
             <div className="h-[400px] flex items-center justify-center">
@@ -155,7 +158,7 @@ function CompositionCharts() {
 
         {/* Age Groups Pie Chart */}
         <DashboardCard
-          title={`Age Groups Distribution (${selectedYear})`}
+          title={`Age Groups Distribution ${selectedYear === "all" ? "(1981-2020)" : `(${selectedYear})`}`}
         >
           {ageGroupData.length === 0 ? (
             <div className="h-[400px] flex items-center justify-center">
@@ -178,7 +181,7 @@ function CompositionCharts() {
 
         {/* Civil Status Pie Chart */}
         <DashboardCard
-          title={`Civil Status Distribution (${selectedYear})`}
+          title={`Civil Status Distribution ${selectedYear === "all" ? "(1981-2020)" : `(${selectedYear})`}`}
         >
           {civilStatusData.length === 0 ? (
             <div className="h-[400px] flex items-center justify-center">
