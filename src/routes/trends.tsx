@@ -45,6 +45,18 @@ function TrendAnalysis() {
     }
   }, [ageGroups, selectedAgeGroup]);
 
+  // Ensure USA is selected when countries load
+  useEffect(() => {
+    if (countries.length > 0 && !countries.includes(selectedCountry)) {
+      const usaCountry = countries.find(c => c.toUpperCase().includes("USA") || c.includes("UNITED STATES"));
+      if (usaCountry) {
+        setSelectedCountry(usaCountry);
+      } else {
+        setSelectedCountry(countries[0]);
+      }
+    }
+  }, [countries]);
+
   // Transform data for area chart
   const chartData = useMemo(() => {
     const selectedData = ageGroupTrends.find(
@@ -108,6 +120,7 @@ function TrendAnalysis() {
           options={countries.map((c) => ({ value: c, label: c }))}
           onChange={setSelectedCountry}
           className="w-full sm:w-[200px]"
+          placeholder="USA"
         />
         <FilterSelect
           label="Age Group"
@@ -122,7 +135,6 @@ function TrendAnalysis() {
       <DashboardCard
         title={`Emigrant Trends - ${selectedCountry} (${selectedAgeGroup})`}
         description={`Showing emigrant data for ${timeRange === "all" ? "all years" : `last ${timeRange} years`}`}
-        className="pt-0"
       >
         <div className="flex items-center justify-end gap-2 pb-4">
           <Select value={timeRange} onValueChange={setTimeRange}>
