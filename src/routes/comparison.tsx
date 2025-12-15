@@ -11,8 +11,8 @@ export const Route = createFileRoute("/comparison")({
 });
 
 function ComparisonCharts() {
-  const [selectedYear, setSelectedYear] = useState<number>(2020);
-  const { data, loading, error, years } = useComparisonData(selectedYear);
+  const [selectedYear, setSelectedYear] = useState<number | "all">("all");
+  const { data, loading, error, years } = useComparisonData(selectedYear === "all" ? undefined : selectedYear);
 
   if (loading) {
     return (
@@ -30,10 +30,13 @@ function ComparisonCharts() {
     );
   }
 
-  const yearOptions = years.map((year) => ({
-    value: year.toString(),
-    label: year.toString(),
-  }));
+  const yearOptions = [
+    { value: "all", label: "All Years (1981-2020)" },
+    ...years.map((year) => ({
+      value: year.toString(),
+      label: year.toString(),
+    })),
+  ];
 
   return (
     <div className="p-6 space-y-6">
@@ -52,7 +55,7 @@ function ComparisonCharts() {
         <FilterSelect
           label="Year"
           value={selectedYear.toString()}
-          onChange={(value) => setSelectedYear(Number(value))}
+          onChange={(value) => setSelectedYear(value === "all" ? "all" : Number(value))}
           options={yearOptions}
           placeholder="Select a year"
         />
@@ -60,7 +63,7 @@ function ComparisonCharts() {
 
       {/* Chart */}
       <DashboardCard
-        title={`Top Countries by Emigrants (${selectedYear})`}
+        title={`Top Countries by Emigrants ${selectedYear === "all" ? "(1981-2020)" : `(${selectedYear})`}`}
       >
         <div style={{ height: '500px' }}>
           <ResponsiveBar
