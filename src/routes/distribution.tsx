@@ -71,13 +71,13 @@ function DistributionCharts() {
       <div className="grid grid-cols-1 gap-6">
         {/* Country Distribution Density Plot */}
         <DashboardCard
-          title="Top Countries Emigrant Trends (1980-2021)"
+          title="Top Countries Emigrant Trends (1981-2020)"
         >
           <div style={{ height: '500px' }}>
             <ResponsiveLine
             data={countryDensityData}
             margin={{ top: 50, right: 180, bottom: 70, left: 80 }}
-            xScale={{ type: "linear", min: 1980, max: 2021 }}
+            xScale={{ type: "linear", min: 1981, max: 2020 }}
             yScale={{
               type: "linear",
               min: "auto",
